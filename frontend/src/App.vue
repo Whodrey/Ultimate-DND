@@ -1,11 +1,20 @@
-<script setup></script>
+<script setup>
+import TopBar from "@/components/TopBar.vue";
+import BottomBar from "@/components/BottomBar.vue";
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <v-app>
+    <TopBar />
+
+    <v-main>
+      <v-container fluid>
+        <router-view />
+      </v-container>
+    </v-main>
+
+    <BottomBar />
+  </v-app>
 </template>
 
 <style scoped></style>
