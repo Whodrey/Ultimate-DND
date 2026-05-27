@@ -11,12 +11,12 @@ const router = createRouter({
     {
       path: "/dm",
       name: "dm-dashboard",
-      component: () => import("../views/DungeonMaster/DMDashboard.vue"),
+      component: () => import("../views/DMDashboard.vue"),
     },
     {
       path: "/player",
       name: "player-dashboard",
-      component: () => import("../views/Player/PDashboard.vue"),
+      component: () => import("../views/PDashboard.vue"),
     },
   ],
 });

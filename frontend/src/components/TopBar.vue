@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useMenuStore } from "@/stores/menuStore";
 
@@ -12,38 +12,50 @@ const currentTabs = computed(() => {
   return [];
 });
 
-watch(
-  currentTabs,
-  (tabs) => {
-    const tabExists = tabs.some((item) => item.value === menuStore.activeTab);
-
-    if (!tabExists) {
-      menuStore.activeTab = tabs[0]?.value ?? null;
-    }
+const activeTab = computed({
+  get() {
+    if (route.name === "dm-dashboard") return menuStore.activeDMTab;
+    if (route.name === "player-dashboard") return menuStore.activePlayerTab;
+    return null;
   },
-  { immediate: true },
-);
+
+  set(value) {
+    const isValidTab = currentTabs.value.some((item) => item.value === value);
+
+    if (!isValidTab) return;
+
+    if (route.name === "dm-dashboard") menuStore.activeDMTab = value;
+    if (route.name === "player-dashboard") menuStore.activePlayerTab = value;
+  },
+});
 </script>
 
 <template>
-  <v-app-bar>
-    <v-app-bar-title text="Ultimate DND" />
+  <v-container fluid>
+    <v-app-bar height="100">
+      <v-app-bar-title text="Ultimate DND" />
 
-    <v-spacer />
+      <v-btn text to="/">Home</v-btn>
+      <v-btn text to="/player">Player Dashboard</v-btn>
+      <v-btn text to="/dm">DM Dashboard</v-btn>
 
-    <v-btn text to="/">Home</v-btn>
-    <v-btn text to="/player">Player Dashboard</v-btn>
-    <v-btn text to="/dm">DM Dashboard</v-btn>
+      <template>
+        <v-row size="12">
+          <v-col cols="auto"> Campaigns: </v-col>
+          <v-col cols="auto"> </v-col>
+        </v-row>
+      </template>
 
-    <template #extension v-if="currentTabs.length">
-      <v-tabs v-model="menuStore.activeTab" align-tabs="title">
-        <v-tab
-          v-for="item in currentTabs"
-          :key="item.value"
-          :text="item.text"
-          :value="item.value"
-        />
-      </v-tabs>
-    </template>
-  </v-app-bar>
+      <template #extension v-if="currentTabs.length">
+        <v-tabs v-model="activeTab" align-tabs="title">
+          <v-tab
+            v-for="item in currentTabs"
+            :key="item.value"
+            :text="item.text"
+            :value="item.value"
+          />
+        </v-tabs>
+      </template>
+    </v-app-bar>
+  </v-container>
 </template>
