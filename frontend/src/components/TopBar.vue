@@ -28,34 +28,89 @@ const activeTab = computed({
     if (route.name === "player-dashboard") menuStore.activePlayerTab = value;
   },
 });
+
+const activeTopTab = computed(() => {
+  return currentTabs.value.find((item) => item.value === activeTab.value);
+});
+
+const currentSubtabs = computed(() => {
+  return activeTopTab.value?.subtabs ?? [];
+});
+
+const activeSubtab = computed({
+  get() {
+    const firstSubtab = currentSubtabs.value[0]?.value;
+
+    if (!activeTab.value || !firstSubtab) return null;
+
+    if (route.name === "dm-dashboard") {
+      return menuStore.activeDMSubtabs[activeTab.value] ?? firstSubtab;
+    }
+
+    if (route.name === "player-dashboard") {
+      return menuStore.activePlayerSubtabs[activeTab.value] ?? firstSubtab;
+    }
+
+    return null;
+  },
+
+  set(value) {
+    const isValidSubtab = currentSubtabs.value.some(
+      (item) => item.value === value,
+    );
+
+    if (!activeTab.value || !isValidSubtab) return;
+
+    if (route.name === "dm-dashboard") {
+      menuStore.activeDMSubtabs[activeTab.value] = value;
+    }
+
+    if (route.name === "player-dashboard") {
+      menuStore.activePlayerSubtabs[activeTab.value] = value;
+    }
+  },
+});
 </script>
 
 <template>
-  <v-container fluid>
-    <v-app-bar height="100">
-      <v-app-bar-title text="Ultimate DND" />
+  <v-container fluid class="pa-0">
+    <v-row>
+      <v-toolbar>
+        <v-toolbar-title text="Ultimate DND" />
 
-      <v-btn text to="/">Home</v-btn>
-      <v-btn text to="/player">Player Dashboard</v-btn>
-      <v-btn text to="/dm">DM Dashboard</v-btn>
+        <v-col>Campaign: </v-col>
 
-      <template>
-        <v-row size="12">
-          <v-col cols="auto"> Campaigns: </v-col>
-          <v-col cols="auto"> </v-col>
-        </v-row>
-      </template>
+        <v-btn text to="/">Home</v-btn>
+        <v-btn text to="/player">Player Dashboard</v-btn>
+        <v-btn text to="/dm">DM Dashboard</v-btn>
+      </v-toolbar>
+    </v-row>
 
-      <template #extension v-if="currentTabs.length">
-        <v-tabs v-model="activeTab" align-tabs="title">
-          <v-tab
-            v-for="item in currentTabs"
-            :key="item.value"
-            :text="item.text"
-            :value="item.value"
-          />
-        </v-tabs>
-      </template>
-    </v-app-bar>
+    <v-container fluid class="pa-0 align-self-start">
+      <v-row no-gutters>
+        <v-col cols="12" v-if="currentTabs.length">
+          <v-tabs v-model="activeTab" align-tabs="title">
+            <v-tab
+              v-for="item in currentTabs"
+              :key="item.value"
+              :text="item.title ?? item.text"
+              :value="item.value"
+            />
+          </v-tabs>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="12" v-if="currentSubtabs.length">
+          <v-tabs v-model="activeSubtab" align-tabs="title">
+            <v-tab
+              v-for="item in currentSubtabs"
+              :key="item.value"
+              :text="item.title ?? item.text"
+              :value="item.value"
+            />
+          </v-tabs>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-container>
 </template>

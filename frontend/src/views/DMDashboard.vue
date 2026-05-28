@@ -5,10 +5,21 @@ import { useMenuStore } from "@/stores/menuStore";
 const menuStore = useMenuStore();
 
 const activeView = computed(() => {
-  return (
-    menuStore.DMtabs.find((tab) => tab.value === menuStore.activeDMTab)
-      ?.component ?? menuStore.DMtabs[0].component
-  );
+  const activeTab =
+    menuStore.DMtabs.find((tab) => tab.value === menuStore.activeDMTab) ??
+    menuStore.DMtabs[0];
+
+  if (activeTab.subtabs?.length) {
+    const activeSubtabValue =
+      menuStore.activeDMSubtabs[activeTab.value] ?? activeTab.subtabs[0].value;
+
+    return (
+      activeTab.subtabs.find((subtab) => subtab.value === activeSubtabValue)
+        ?.component ?? activeTab.subtabs[0].component
+    );
+  }
+
+  return activeTab.component;
 });
 </script>
 
