@@ -1,5 +1,5 @@
 <script setup></script>
 
 <template>
-  <v-container fluid>combat </v-container>
+  <div>combat</div>
 </template>

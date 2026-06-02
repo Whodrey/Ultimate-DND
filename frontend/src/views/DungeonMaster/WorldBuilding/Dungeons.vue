@@ -1,5 +1,5 @@
 <script setup></script>
 
 <template>
-  <v-container fluid>dungeons</v-container>
+  <div>dungeons</div>
 </template>

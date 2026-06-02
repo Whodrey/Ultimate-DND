@@ -9,13 +9,26 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
     },
     {
+      path: "/campaigns/:campaignId",
+      name: "campaign-home",
+      component: () => import("../views/HomeView.vue"),
+    },
+    {
       path: "/dm",
-      name: "dm-dashboard",
+      redirect: { name: "home" },
+    },
+    {
+      path: "/campaigns/:campaignId/dm",
+      name: "campaign-dm-dashboard",
       component: () => import("../views/DMDashboard.vue"),
     },
     {
       path: "/player",
-      name: "player-dashboard",
+      redirect: { name: "home" },
+    },
+    {
+      path: "/campaigns/:campaignId/player",
+      name: "campaign-player-dashboard",
       component: () => import("../views/PDashboard.vue"),
     },
   ],
