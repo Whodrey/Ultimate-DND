@@ -1,5 +1,11 @@
 <script setup></script>
 
 <template>
-  <div>events</div>
+  <v-container fluid>
+    <v-row>
+      <v-col>
+        <h1>Events</h1>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

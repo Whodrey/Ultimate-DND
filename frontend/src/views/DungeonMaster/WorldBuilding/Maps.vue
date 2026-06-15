@@ -1,5 +1,11 @@
 <script setup></script>
 
 <template>
-  <div>maps</div>
+  <v-container fluid>
+    <v-row>
+      <v-col>
+        <h1>Maps</h1>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
