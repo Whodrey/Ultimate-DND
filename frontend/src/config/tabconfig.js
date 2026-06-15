@@ -36,10 +36,10 @@ export const DMtabs = [
         ),
       },
       {
-        title: "Dungeons",
-        value: "dungeons",
+        title: "Locations",
+        value: "locations",
         component: view(
-          () => import("@/views/DungeonMaster/WorldBuilding/Dungeons.vue"),
+          () => import("@/views/DungeonMaster/WorldBuilding/Locations.vue"),
         ),
       },
       {
