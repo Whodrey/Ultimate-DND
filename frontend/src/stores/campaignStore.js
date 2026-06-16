@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-const apiUrl = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const apiUrl = import.meta.env.VITE_BACKEND_URL ?? "/api";
 
 export const useCampaignStore = defineStore(
   "campaign",
