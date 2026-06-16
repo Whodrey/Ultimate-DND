@@ -1,0 +1,35 @@
+name: Deploy to Whodrey Homelab
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ubuntu-main.tailb715c3.ts.net
+          username: whodrey
+          key: ${{ secrets.HOMELAB_SSH_KEY }}
+          script: |
+            set -e
+
+            SITE_NAME="ultimate-dnd"
+            SITE_PATH="/home/whodrey/docker/sites/$SITE_NAME"
+
+            mkdir -p "$SITE_PATH"
+
+            if [ ! -d "$SITE_PATH/.git" ]; then
+              git clone "https://github.com/Whodrey/Ultimate-DND.git" "$SITE_PATH"
+            fi
+
+            cd "$SITE_PATH"
+            git fetch origin main
+            git reset --hard origin/main
+
+            /home/whodrey/homelab-infra/scripts/deploy-site.sh "$SITE_PATH"
