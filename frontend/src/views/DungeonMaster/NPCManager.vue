@@ -7,7 +7,6 @@ const menuStore = useMenuStore();
 
 <template>
   <div>
-    <div>npc</div>
     <ActiveSubtabView
       :tabs="menuStore.DMtabs"
       tab-value="npcmanager"

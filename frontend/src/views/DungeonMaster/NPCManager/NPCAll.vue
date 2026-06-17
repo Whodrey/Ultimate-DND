@@ -1,3 +1,9 @@
-<script setup></script>
+<script setup>
+import CharCreator from "@/components/CharCreator.vue";
+</script>
 
-<template></template>
+<template>
+  <v-container fluid>
+    <CharCreator></CharCreator>
+  </v-container>
+</template>
