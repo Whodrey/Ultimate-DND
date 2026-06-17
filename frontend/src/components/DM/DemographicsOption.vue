@@ -9,7 +9,7 @@ if (!demographics.value.length) {
   demographics.value = cityStore.createDefaultDemographics();
 }
 
-const setSpeciesValue = (speciesName, value) => {
+function setSpeciesValue(speciesName, value) {
   const parsedValue = Number(value || 0);
   const numberValue = Number.isFinite(parsedValue) ? parsedValue : 0;
   const totalExceptSpecies = demographics.value.reduce(
@@ -27,7 +27,7 @@ const setSpeciesValue = (speciesName, value) => {
       ? { ...currentSpecies, val: nextValue }
       : currentSpecies,
   );
-};
+}
 </script>
 
 <template>

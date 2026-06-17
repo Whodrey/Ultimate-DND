@@ -9,31 +9,47 @@ const addCity = ref(false);
 const editCity = ref(false);
 const selectedCity = ref(null);
 
-const cityTableHeaders = [
-  { title: "Name", key: "name" },
-  { title: "Size", key: "sizeDisplay" },
-  { title: "Population", key: "populationDisplay", align: "end" },
-  { title: "Vibe", key: "vibeDisplay", sortable: false },
-  { title: "Demographics", key: "demographicsDisplay", sortable: false },
-  { title: "Description", key: "descriptionDisplay" },
+const cityTableDisplayFields = {
+  size: "sizeDisplay",
+  population: "populationDisplay",
+  vibe: "vibeDisplay",
+  demographics: "demographicsDisplay",
+  description: "descriptionDisplay",
+};
+
+const cityTableAlignments = {
+  population: "end",
+};
+
+const unsortableCityFields = new Set(["vibe", "demographics"]);
+
+const cityTableHeaders = computed(() => [
+  ...Object.entries(cityStore.cityOptions).map(([fieldKey, field]) => ({
+    title: field.label,
+    key: cityTableDisplayFields[fieldKey] ?? fieldKey,
+    ...(cityTableAlignments[fieldKey]
+      ? { align: cityTableAlignments[fieldKey] }
+      : {}),
+    ...(unsortableCityFields.has(fieldKey) ? { sortable: false } : {}),
+  })),
   { title: "", key: "actions", sortable: false, align: "end" },
-];
+]);
 
 const numberFormatter = new Intl.NumberFormat();
 
-const formatPopulation = (population) => {
+function formatPopulation(population) {
   if (population === null || population === undefined) return "Unspecified";
 
   return numberFormatter.format(population);
-};
+}
 
-const formatVibe = (vibe) => {
+function formatVibe(vibe) {
   if (!Array.isArray(vibe) || !vibe.length) return "Unspecified";
 
   return vibe.join(", ");
-};
+}
 
-const formatDemographics = (demographics) => {
+function formatDemographics(demographics) {
   if (!Array.isArray(demographics)) return "Unspecified";
 
   const selectedDemographics = demographics
@@ -46,7 +62,7 @@ const formatDemographics = (demographics) => {
   return selectedDemographics
     .map((species) => `${species.name} ${species.val}%`)
     .join(", ");
-};
+}
 
 const cityRows = computed(() =>
   cityStore.cities.map((city) => ({
@@ -59,15 +75,15 @@ const cityRows = computed(() =>
   })),
 );
 
-const openEditCity = (city) => {
+function openEditCity(city) {
   selectedCity.value = city;
   editCity.value = true;
-};
+}
 
-const closeEditCity = () => {
+function closeEditCity() {
   editCity.value = false;
   selectedCity.value = null;
-};
+}
 </script>
 
 <template>

@@ -14,31 +14,40 @@ const emit = defineEmits(["close"]);
 
 const isEditing = computed(() => Boolean(props.city?.id));
 
-const createDemographics = () => {
+function createDemographics() {
   if (!Array.isArray(props.city?.demographics)) {
     return cityStore.createDefaultDemographics();
   }
 
   return props.city.demographics.map((species) => ({ ...species }));
-};
+}
 
 const cityName = ref(props.city?.name ?? "");
 const sizeSelect = ref(props.city?.size ?? null);
 const population = ref(props.city?.population ?? null);
-const vibeSelect = ref(Array.isArray(props.city?.vibe) ? [...props.city.vibe] : []);
+const vibeSelect = ref(
+  Array.isArray(props.city?.vibe) ? [...props.city.vibe] : [],
+);
 const demographics = ref(createDemographics());
 const description = ref(props.city?.description ?? "");
 
-const resetForm = () => {
+const formTitle = computed(() => {
+  if (!isEditing.value) return "Add new city";
+
+  const currentCityName = cityName.value.trim();
+  return currentCityName ? `Edit ${currentCityName}` : "Edit city";
+});
+
+function resetForm() {
   cityName.value = "";
   sizeSelect.value = null;
   population.value = null;
   vibeSelect.value = [];
   demographics.value = cityStore.createDefaultDemographics();
   description.value = "";
-};
+}
 
-const saveCity = () => {
+function saveCity() {
   const cityData = {
     name: cityName.value,
     size: sizeSelect.value,
@@ -56,44 +65,50 @@ const saveCity = () => {
 
   resetForm();
   emit("close");
-};
+}
 </script>
 
 <template>
   <v-container fluid class="pa-0">
     <v-card color="surface" class="new-city-card pa-5 d-flex flex-column">
       <v-card-title class="flex-shrink-0">
-        {{ isEditing ? "Edit city" : "Add new city" }}
+        {{ formTitle }}
       </v-card-title>
       <v-card-text class="new-city-card-text flex-grow-1 overflow-y-auto">
         <v-form @submit.prevent="saveCity">
           <v-row>
-            <v-col cols="12" md="4">
-              <v-text-field v-model="cityName" label="City Name" />
+            <v-col cols="4">
+              <v-text-field
+                v-model="cityName"
+                :label="cityStore.cityOptions.name.label"
+              />
               <v-select
                 v-model="sizeSelect"
-                label="Size"
-                :items="cityStore.cityOptions.size"
+                :label="cityStore.cityOptions.size.label"
+                :items="cityStore.cityOptions.size.options"
               />
               <v-text-field
                 v-model="population"
-                label="Population"
+                :label="cityStore.cityOptions.population.label"
                 type="number"
               />
               <v-combobox
                 v-model="vibeSelect"
-                :items="cityStore.cityOptions.vibe"
-                label="Vibe"
+                :items="cityStore.cityOptions.vibe.options"
+                :label="cityStore.cityOptions.vibe.label"
                 multiple
                 chips
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="4">
               <DemographicsOption v-model="demographics" />
             </v-col>
-            <v-col cols="12" md="4">
-              <v-textarea v-model="description" label="Description" />
+            <v-col cols="4">
+              <v-textarea
+                v-model="description"
+                :label="cityStore.cityOptions.description.label"
+              />
             </v-col>
           </v-row>
         </v-form>

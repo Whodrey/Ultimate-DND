@@ -6,20 +6,38 @@ export const useCityStore = defineStore(
   () => {
     const cities = ref([]);
     const cityOptions = ref({
-      size: ["Hamlet", "Village", "Town", "City", "Metropolis"],
-      vibe: [
-        "Bustling",
-        "Quiet",
-        "Dangerous",
-        "Prosperous",
-        "Corrupt",
-        "Religious",
-        "Magical",
-        "Industrial",
-        "Port",
-        "Mining",
-        "Farming",
-      ],
+      name: {
+        label: "City Name",
+      },
+      size: {
+        label: "Size",
+        options: ["Hamlet", "Village", "Town", "City", "Metropolis"],
+      },
+      population: {
+        label: "Population",
+      },
+      vibe: {
+        label: "Vibe",
+        options: [
+          "Bustling",
+          "Quiet",
+          "Dangerous",
+          "Prosperous",
+          "Corrupt",
+          "Religious",
+          "Magical",
+          "Industrial",
+          "Port",
+          "Mining",
+          "Farming",
+        ],
+      },
+      demographics: {
+        label: "Demographics",
+      },
+      description: {
+        label: "Description",
+      },
     });
 
     const speciesOptions = [
@@ -53,7 +71,11 @@ export const useCityStore = defineStore(
     }
 
     function normalizePopulation(population) {
-      if (population === null || population === undefined || population === "") {
+      if (
+        population === null ||
+        population === undefined ||
+        population === ""
+      ) {
         return null;
       }
 
@@ -67,10 +89,7 @@ export const useCityStore = defineStore(
       const demographicsByName = new Map(
         (Array.isArray(demographics) ? demographics : []).map((species) => [
           species.name,
-          Math.min(
-            maxDemographicsTotal,
-            Math.max(0, Number(species.val || 0)),
-          ),
+          Math.min(maxDemographicsTotal, Math.max(0, Number(species.val || 0))),
         ]),
       );
 
@@ -141,6 +160,8 @@ export const useCityStore = defineStore(
     };
   },
   {
-    persist: true,
+    persist: {
+      pick: ["cities"],
+    },
   },
 );
