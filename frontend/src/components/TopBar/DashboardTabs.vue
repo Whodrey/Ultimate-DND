@@ -26,7 +26,7 @@ const activeTab = computed(() => {
   return null;
 });
 
-const handleTabChange = (value) => {
+function handleTabChange(value) {
   console.log("Tab change triggered:", value, "Route name:", route.name);
   const isValidTab = currentTabs.value.some((item) => item.value === value);
   if (!isValidTab) {
@@ -51,7 +51,7 @@ const handleTabChange = (value) => {
     path: route.path,
     query: { ...route.query, tab: value, subtab: undefined },
   });
-};
+}
 
 const activeTopTab = computed(() => {
   return currentTabs.value.find((item) => item.value === activeTab.value);
@@ -83,7 +83,7 @@ const activeSubtab = computed(() => {
   return null;
 });
 
-const handleSubtabChange = (value) => {
+function handleSubtabChange(value) {
   const isValidSubtab = currentSubtabs.value.some(
     (item) => item.value === value,
   );
@@ -102,7 +102,7 @@ const handleSubtabChange = (value) => {
     path: route.path,
     query: { ...route.query, tab: activeTab.value, subtab: value },
   });
-};
+}
 
 // Sync from URL on mount
 onMounted(() => {

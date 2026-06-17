@@ -1,6 +1,8 @@
 import { defineAsyncComponent, markRaw } from "vue";
 
-const view = (loader) => markRaw(defineAsyncComponent(loader));
+function view(loader) {
+  return markRaw(defineAsyncComponent(loader));
+}
 
 /**
   {

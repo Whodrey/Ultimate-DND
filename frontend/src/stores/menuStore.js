@@ -2,13 +2,13 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { DMtabs, PlayerTabs } from "@/config/tabconfig";
 
-const getInitialSubtabs = (tabs) => {
+function getInitialSubtabs(tabs) {
   return Object.fromEntries(
     tabs
       .filter((tab) => tab.subtabs?.length)
       .map((tab) => [tab.value, tab.subtabs[0].value]),
   );
-};
+}
 
 export const useMenuStore = defineStore(
   "menu",
