@@ -97,6 +97,11 @@ export const DMtabs = [
 
 export const PlayerTabs = [
   {
+    title: "Overview",
+    value: "overview",
+    component: view(() => import("@/views/Player/Overview.vue")),
+  },
+  {
     title: "Character Sheet",
     value: "charactersheet",
     component: view(() => import("@/views/Player/CharacterSheet.vue")),
