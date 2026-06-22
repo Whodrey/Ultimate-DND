@@ -67,54 +67,48 @@ function saveLocation() {
         {{ formTitle }}
       </v-card-title>
       <v-card-text class="flex-grow-1 overflow-y-auto">
-        <v-form @submit.prevent="saveLocation">
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                v-model="locationName"
-                :label="locationStore.locationOptions.name.label"
-              />
-              <v-select
-                v-model="typeSelect"
-                :label="locationStore.locationOptions.type.label"
-                :items="locationStore.locationOptions.type.options"
-                item-title="label"
-                item-value="value"
-              />
-            </v-col>
-            <v-col cols="6">
-              <v-textarea
-                v-model="description"
-                :label="locationStore.locationOptions.description.label"
-              />
-            </v-col>
-            <v-col cols="12">
-              <v-slider
-                v-model="danger"
-                :label="locationStore.locationOptions.danger.label"
-                :ticks="locationStore.locationOptions.danger.options"
-                min="0"
-                show-ticks="always"
-                step="1"
-                :max="
-                  Object.keys(locationStore.locationOptions.danger.options)
-                    .length - 1
-                "
-              />
-              <v-slider
-                v-model="state"
-                :label="locationStore.locationOptions.state.label"
-                :ticks="locationStore.locationOptions.state.options"
-                min="0"
-                show-ticks="always"
-                step="1"
-                :max="
-                  Object.keys(locationStore.locationOptions.state.options)
-                    .length - 1
-                "
-              />
-            </v-col>
-          </v-row>
+        <v-form class="form-grid" @submit.prevent="saveLocation">
+          <v-text-field
+            v-model="locationName"
+            :label="locationStore.locationOptions.name.label"
+          />
+          <v-select
+            v-model="typeSelect"
+            :label="locationStore.locationOptions.type.label"
+            :items="locationStore.locationOptions.type.options"
+            item-title="label"
+            item-value="value"
+          />
+          <v-textarea
+            v-model="description"
+            :label="locationStore.locationOptions.description.label"
+          />
+          <v-slider
+            v-model="danger"
+            class="form-grid__full"
+            :label="locationStore.locationOptions.danger.label"
+            :ticks="locationStore.locationOptions.danger.options"
+            min="0"
+            show-ticks="always"
+            step="1"
+            :max="
+              Object.keys(locationStore.locationOptions.danger.options)
+                .length - 1
+            "
+          />
+          <v-slider
+            v-model="state"
+            class="form-grid__full"
+            :label="locationStore.locationOptions.state.label"
+            :ticks="locationStore.locationOptions.state.options"
+            min="0"
+            show-ticks="always"
+            step="1"
+            :max="
+              Object.keys(locationStore.locationOptions.state.options).length -
+              1
+            "
+          />
         </v-form>
       </v-card-text>
       <v-card-actions class="justify-end">

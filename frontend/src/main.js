@@ -3,6 +3,7 @@ import { createApp } from "vue";
 // Vuetify
 import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
+import "./styles/form-layout.css";
 import vuetify from "./plugins/vuetify";
 
 import App from "./App.vue";

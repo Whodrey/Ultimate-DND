@@ -75,42 +75,34 @@ function saveCity() {
         {{ formTitle }}
       </v-card-title>
       <v-card-text class="new-city-card-text flex-grow-1 overflow-y-auto">
-        <v-form @submit.prevent="saveCity">
-          <v-row>
-            <v-col cols="4">
-              <v-text-field
-                v-model="cityName"
-                :label="cityStore.cityOptions.name.label"
-              />
-              <v-select
-                v-model="sizeSelect"
-                :label="cityStore.cityOptions.size.label"
-                :items="cityStore.cityOptions.size.options"
-              />
-              <v-text-field
-                v-model="population"
-                :label="cityStore.cityOptions.population.label"
-                type="number"
-              />
-              <v-combobox
-                v-model="vibeSelect"
-                :items="cityStore.cityOptions.vibe.options"
-                :label="cityStore.cityOptions.vibe.label"
-                multiple
-                chips
-                clearable
-              />
-            </v-col>
-            <v-col cols="4">
-              <DemographicsOption v-model="demographics" />
-            </v-col>
-            <v-col cols="4">
-              <v-textarea
-                v-model="description"
-                :label="cityStore.cityOptions.description.label"
-              />
-            </v-col>
-          </v-row>
+        <v-form class="form-grid" @submit.prevent="saveCity">
+          <v-text-field
+            v-model="cityName"
+            :label="cityStore.cityOptions.name.label"
+          />
+          <v-select
+            v-model="sizeSelect"
+            :label="cityStore.cityOptions.size.label"
+            :items="cityStore.cityOptions.size.options"
+          />
+          <v-text-field
+            v-model="population"
+            :label="cityStore.cityOptions.population.label"
+            type="number"
+          />
+          <v-combobox
+            v-model="vibeSelect"
+            :items="cityStore.cityOptions.vibe.options"
+            :label="cityStore.cityOptions.vibe.label"
+            multiple
+            chips
+            clearable
+          />
+          <DemographicsOption v-model="demographics" />
+          <v-textarea
+            v-model="description"
+            :label="cityStore.cityOptions.description.label"
+          />
         </v-form>
       </v-card-text>
 
