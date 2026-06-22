@@ -1,0 +1,49 @@
+name: ${SITE_NAME:-ultimate-dnd}-dev
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: ${SITE_NAME:-ultimate-dnd}-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-5174}:5174"
+    environment:
+      - DEV_API_PROXY_TARGET=http://backend:8080
+      - VITE_USE_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ${SITE_NAME:-ultimate-dnd}-backend-dev
+    restart: unless-stopped
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://database:27017/ultimate-dnd
+      - MONGO_DB=ultimate-dnd
+    volumes:
+      - ./backend:/app
+      - backend-node-modules:/app/node_modules
+    depends_on:
+      - database
+
+  database:
+    image: mongo:8
+    container_name: ${SITE_NAME:-ultimate-dnd}-database-dev
+    restart: unless-stopped
+    volumes:
+      - mongo-data-dev:/data/db
+
+volumes:
+  frontend-node-modules:
+  backend-node-modules:
+  mongo-data-dev:
