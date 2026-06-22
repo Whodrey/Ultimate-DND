@@ -1,6 +1,7 @@
 <script setup>
 import { useLocationStore } from "@/stores/locationStore";
 import LocationForm from "@/components/DM/LocationForm.vue";
+import DataTableDisplay from "@/components/DataTableDisplay.vue";
 import { computed, ref } from "vue";
 
 const locationStore = useLocationStore();
@@ -82,40 +83,32 @@ function closeEditLocation() {
       </v-col>
     </v-row>
 
-    <v-card color="surface" class="mt-4">
-      <v-data-table
-        :headers="locationTableHeaders"
-        :items="locationRows"
-        item-value="id"
-        density="comfortable"
-        :items-per-page="10"
-      >
-        <template v-slot:item.actions="{ item }">
-          <v-menu>
-            <template v-slot:activator="{ props: activatorProps }">
-              <v-btn
-                v-bind="activatorProps"
-                icon="mdi-dots-vertical"
-                variant="text"
-                size="small"
-              />
-            </template>
+    <DataTableDisplay
+      class="mt-4"
+      empty-text="No locations created yet."
+      row-key="id"
+      :headers="locationTableHeaders"
+      :items="locationRows"
+    >
+      <template v-slot:item.actions="{ item }">
+        <v-menu>
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn
+              v-bind="activatorProps"
+              icon="mdi-dots-vertical"
+              variant="text"
+              size="small"
+            />
+          </template>
 
-            <v-list density="compact">
-              <v-list-item @click="openEditLocation(item)">
-                <v-list-item-title>Edit</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-
-        <template v-slot:no-data>
-          <div class="pa-6 text-medium-emphasis">
-            No locations created yet.
-          </div>
-        </template>
-      </v-data-table>
-    </v-card>
+          <v-list density="compact">
+            <v-list-item @click="openEditLocation(item)">
+              <v-list-item-title>Edit</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+    </DataTableDisplay>
 
     <v-dialog v-model="editLocation">
       <LocationForm
