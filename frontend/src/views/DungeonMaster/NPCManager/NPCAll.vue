@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import CharCreator from "@/components/CharCreator.vue";
+import CharCreator from "@/components/CharacterCreation/CharCreator.vue";
 
 const addNPC = ref(false);
 </script>

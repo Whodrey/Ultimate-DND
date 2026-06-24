@@ -1,0 +1,32 @@
+export const speciesOptions = {
+  label: "Species",
+  options: {
+    Dragonborn: [
+      "Black (Acid)",
+      "Blue (Lightning)",
+      "Brass (Fire)",
+      "Bronze (Lightning)",
+      "Copper (Acid)",
+      "Gold (Fire)",
+      "Green (Poison)",
+      "Red (Fire)",
+      "Silver (Cold)",
+      "White (Cold)",
+    ],
+    Dwarf: ["Mountain Dwarf", "Hill Dwarf"],
+    Elf: ["High Elf", "Wood Elf", "Drow"],
+    Gnome: ["Forest Gnome", "Rock Gnome"],
+    Goliath: [
+      "Cloud's Jaunt",
+      "Fire's Burn",
+      "Frost's Chill",
+      "Hill's Tumble",
+      "Stone's Endurance",
+      "Storm's Thunder",
+    ],
+    Halfling: [],
+    Human: [],
+    Orc: [],
+    Tiefling: ["Abyssal", "Chtonic", "Infernal"],
+  },
+};
