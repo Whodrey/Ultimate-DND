@@ -105,6 +105,22 @@ export const PlayerTabs = [
     title: "Character Sheet",
     value: "charactersheet",
     component: view(() => import("@/views/Player/CharacterSheet.vue")),
+    subtabs: [
+      {
+        title: "Overview",
+        value: "overview",
+        component: view(
+          () => import("@/views/Player/CharacterSheet/Overview.vue"),
+        ),
+      },
+      {
+        title: "Spells",
+        value: "spells",
+        component: view(
+          () => import("@/views/Player/CharacterSheet/Spells.vue"),
+        ),
+      },
+    ],
   },
   {
     title: "Inventory",
