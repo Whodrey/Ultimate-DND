@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useCharacterStore } from "@/stores/characterStore";
 import Skills from "./Skills.vue";
 import BaseAbilities from "./BaseAbilities.vue";
@@ -7,7 +7,7 @@ import Spells from "./Spells.vue";
 
 const props = defineProps({
   charType: {
-    type: "string",
+    type: String,
   },
 });
 
@@ -17,12 +17,20 @@ const selectedType = ref(null);
 
 // v-stepper
 const step = ref(1);
-const steps = [
-  { value: 1, title: "Identity" },
-  { value: 2, title: "Base abilities" },
-  { value: 3, title: "Skills" },
-  { value: 4, title: "Spells" },
-];
+const steps = computed(() => {
+  const visibleSteps = [
+    { value: 1, title: "Identity" },
+    { value: 2, title: "Base abilities" },
+    { value: 3, title: "Skills" },
+  ];
+
+  if (characterStore.canUseSpells()) {
+    visibleSteps.push({ value: 4, title: "Spells" });
+  }
+
+  return visibleSteps;
+});
+const stepItems = computed(() => steps.value.map((visibleStep) => visibleStep.title));
 
 const speciesOptions = computed(() =>
   Object.keys(characterStore.charOptions.species.options).map((species) => ({
@@ -80,6 +88,7 @@ const selectedClass = computed({
     characterStore.newChar.class = classKey;
     characterStore.newChar.subclass = "";
     applyClassDefaultAbilityScore(classKey);
+    characterStore.syncCharacterSelections();
   },
 });
 
@@ -87,6 +96,7 @@ const selectedSubclass = computed({
   get: () => characterStore.newChar.subclass,
   set: (subclass) => {
     characterStore.newChar.subclass = subclass;
+    characterStore.syncCharacterSelections();
   },
 });
 
@@ -105,7 +115,7 @@ function applyClassDefaultAbilityScore(classKey) {
 
   if (!defaultAbilityScore) return;
 
-  Object.assign(abilityScore, defaultAbilityScore);
+  Object.assign(characterStore.newChar.ability_score, defaultAbilityScore);
 }
 
 const selectedClassData = computed(() => {
@@ -114,13 +124,41 @@ const selectedClassData = computed(() => {
 });
 
 const canChooseSubclass = computed(
-  () => Number(characterStore.newChar.level) >= 3,
+  () =>
+    Boolean(selectedClassData.value?.subclasses?.length) &&
+    Number(characterStore.newChar.level) >= 3,
 );
 
 const subclassOptions = computed(() => {
   if (!canChooseSubclass.value || !selectedClassData.value) return [];
   return selectedClassData.value.subclasses;
 });
+
+watch(
+  stepItems,
+  () => {
+    if (step.value > stepItems.value.length) {
+      step.value = stepItems.value.length;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => [
+    characterStore.newChar.class,
+    characterStore.newChar.level,
+    characterStore.newChar.subclass,
+  ],
+  () => {
+    if (!canChooseSubclass.value && characterStore.newChar.subclass) {
+      characterStore.newChar.subclass = "";
+    }
+
+    characterStore.syncCharacterSelections();
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -139,7 +177,7 @@ const subclassOptions = computed(() => {
       </v-card-title>
       <v-card-text class="flex-grow-1 overflow-y-auto">
         <v-form v-if="selectedType">
-          <v-stepper flat v-model="step" :items="steps.map((s) => s.title)">
+          <v-stepper flat v-model="step" :items="stepItems">
             <template #item.1>
               <div class="form-grid">
                 <v-text-field label="Name" />

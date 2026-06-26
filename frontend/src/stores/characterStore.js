@@ -9,7 +9,11 @@ import {
   backgroundOptions,
   getBackgroundAbilityScoreBonus,
 } from "../charOptions/background.js";
-import { classOptions } from "../charOptions/class.js";
+import {
+  classOptions,
+  getClassSkillChoices,
+  getClassSpellcastingProfile,
+} from "../charOptions/class.js";
 import { skillOptions } from "../charOptions/skills.js";
 import { speciesOptions } from "../charOptions/species.js";
 
@@ -46,10 +50,6 @@ export const useCharacterStore = defineStore(
       class: classOptions,
     });
 
-    function specificOptions() {
-      return getBackgroundAbilityScoreBonus(newChar.value.background);
-    }
-
     const newChar = ref({
       name: "",
       surname: "",
@@ -61,9 +61,95 @@ export const useCharacterStore = defineStore(
       ability_score: createPointBuyAbilityScore(),
       class: "",
       subclass: "",
+      skills: [],
+      spells: {},
     });
 
-    return { charType, charOptions, newChar, specificOptions };
+    function ensureCharacterSelections() {
+      const character = newChar.value;
+
+      if (!Array.isArray(character.skills)) {
+        character.skills = [];
+      }
+
+      if (
+        !character.spells ||
+        typeof character.spells !== "object" ||
+        Array.isArray(character.spells)
+      ) {
+        character.spells = {};
+      }
+    }
+
+    function specificOptions() {
+      return getBackgroundAbilityScoreBonus(newChar.value.background);
+    }
+
+    function classSkillChoices() {
+      return getClassSkillChoices(newChar.value.class);
+    }
+
+    function spellcastingProfile() {
+      return getClassSpellcastingProfile(
+        newChar.value.class,
+        newChar.value.level,
+        newChar.value.subclass,
+      );
+    }
+
+    function canUseSpells() {
+      return Boolean(spellcastingProfile());
+    }
+
+    function syncCharacterSelections() {
+      ensureCharacterSelections();
+
+      const character = newChar.value;
+      const skillChoices = classSkillChoices();
+      const allowedSkills = new Set(skillChoices.options);
+
+      character.skills = Array.from(new Set(character.skills))
+        .filter((skill) => allowedSkills.has(skill))
+        .slice(0, skillChoices.choose);
+
+      const spellProfile = spellcastingProfile();
+
+      if (!spellProfile) {
+        character.spells = {};
+        return;
+      }
+
+      const spellLimits = { ...spellProfile.spellLevelLimits };
+
+      if (spellProfile.cantrips > 0) {
+        spellLimits[0] = spellProfile.cantrips;
+      }
+
+      character.spells = Object.fromEntries(
+        Object.entries(spellLimits).map(([level, limit]) => {
+          const selectedSpells = Array.isArray(character.spells[level])
+            ? character.spells[level]
+            : [];
+
+          return [
+            level,
+            Array.from(new Set(selectedSpells)).filter(Boolean).slice(0, limit),
+          ];
+        }),
+      );
+    }
+
+    return {
+      charType,
+      charOptions,
+      newChar,
+      specificOptions,
+      ensureCharacterSelections,
+      classSkillChoices,
+      spellcastingProfile,
+      canUseSpells,
+      syncCharacterSelections,
+    };
   },
   {
     persist: true,
