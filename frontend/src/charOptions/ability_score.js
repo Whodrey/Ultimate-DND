@@ -54,6 +54,16 @@ export function getAbilityScorePointCost(score) {
   return abilityScorePointBuy.costs[clampedScore] ?? 0;
 }
 
+export function getAbilityScoreModifier(score) {
+  const numericScore = Number(score);
+
+  if (!Number.isFinite(numericScore)) {
+    return 0;
+  }
+
+  return Math.floor((numericScore - 10) / 2);
+}
+
 export const abilityScoreOptions = {
   label: "Ability Scores",
   options: {
