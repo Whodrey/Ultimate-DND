@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useSpellStore } from "@/stores/spellStore";
 import Skills from "./Skills.vue";
 import BaseAbilities from "./BaseAbilities.vue";
 import Spells from "./Spells.vue";
@@ -12,25 +13,39 @@ const props = defineProps({
 });
 
 const characterStore = useCharacterStore();
-const charType = ref(["simpleNPC", "complexNPC", "NPCwCharSheet", "Player"]);
-const selectedType = ref(null);
+const spellStore = useSpellStore();
 
 // v-stepper
 const step = ref(1);
 const steps = computed(() => {
-  const visibleSteps = [
-    { value: 1, title: "Identity" },
-    { value: 2, title: "Base abilities" },
-    { value: 3, title: "Skills" },
-  ];
+  const visibleSteps = [{ value: 1, title: "Identity" }];
 
-  if (characterStore.canUseSpells()) {
+  if (
+    characterStore.selectedType !== "simplenpc" &&
+    characterStore.selectedType !== "complexnpc"
+  ) {
+    visibleSteps.push(
+      { value: 2, title: "Base abilities" },
+      { value: 3, title: "Skills" },
+    );
+  }
+
+  if (
+    characterStore.selectedType !== "simplenpc" &&
+    characterStore.selectedType !== "complexnpc" &&
+    characterStore.canUseSpells()
+  ) {
     visibleSteps.push({ value: 4, title: "Spells" });
   }
 
   return visibleSteps;
 });
-const stepItems = computed(() => steps.value.map((visibleStep) => visibleStep.title));
+const stepItems = computed(() =>
+  steps.value.map((visibleStep) => visibleStep.title),
+);
+const hasSpellStep = computed(() =>
+  steps.value.some((visibleStep) => visibleStep.value === 4),
+);
 
 const speciesOptions = computed(() =>
   Object.keys(characterStore.charOptions.species.options).map((species) => ({
@@ -145,6 +160,16 @@ watch(
 );
 
 watch(
+  hasSpellStep,
+  (isVisible) => {
+    if (isVisible) {
+      spellStore.loadSpells();
+    }
+  },
+  { immediate: true },
+);
+
+watch(
   () => [
     characterStore.newChar.class,
     characterStore.newChar.level,
@@ -170,13 +195,15 @@ watch(
           <v-select
             density="compact"
             placeholder="Character Type"
-            :items="charType"
-            v-model="selectedType"
+            :items="characterStore.charType"
+            item-title="title"
+            item-value="value"
+            v-model="characterStore.selectedType"
           />
         </div>
       </v-card-title>
       <v-card-text class="flex-grow-1 overflow-y-auto">
-        <v-form v-if="selectedType">
+        <v-form v-if="characterStore.selectedType">
           <v-stepper flat v-model="step" :items="stepItems">
             <template #item.1>
               <div class="form-grid">
@@ -196,33 +223,34 @@ watch(
                   label="Subspecies"
                   :items="selectedSubspeciesOptions"
                 />
-                <v-select
-                  v-model="selectedBackground"
-                  label="Background"
-                  :items="backgroundOptions"
-                  item-title="title"
-                  item-value="value"
-                />
-                <v-number-input
-                  v-model="characterStore.newChar.level"
-                  label="Level"
-                  :min="1"
-                  :max="20"
-                />
-                <v-select
-                  v-model="selectedClass"
-                  label="Class"
-                  :items="classOptions"
-                />
-                <v-select
-                  v-if="canChooseSubclass && selectedClass"
-                  v-model="selectedSubclass"
-                  label="Subclass"
-                  :items="subclassOptions"
-                />
+                <template v-if="characterStore.selectedType !== 'simplenpc'">
+                  <v-select
+                    v-model="selectedBackground"
+                    label="Background"
+                    :items="backgroundOptions"
+                    item-title="title"
+                    item-value="value"
+                  />
+                  <v-number-input
+                    v-model="characterStore.newChar.level"
+                    label="Level"
+                    :min="1"
+                    :max="20"
+                  />
+                  <v-select
+                    v-model="selectedClass"
+                    label="Class"
+                    :items="classOptions"
+                  />
+                  <v-select
+                    v-if="canChooseSubclass && selectedClass"
+                    v-model="selectedSubclass"
+                    label="Subclass"
+                    :items="subclassOptions"
+                  />
+                </template>
               </div>
             </template>
-
             <template #item.2>
               <BaseAbilities />
             </template>
