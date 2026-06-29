@@ -20,9 +20,16 @@ import { speciesOptions } from "../charOptions/species.js";
 export const useCharacterStore = defineStore(
   "character",
   () => {
-    const charType = ["simpleNPC", "complexNPC", "NPCwCharSheet", "Player"];
     const range = (min, max) =>
       Array.from({ length: max - min + 1 }, (_, index) => min + index);
+
+    const charType = [
+      { title: "Simple NPC", value: "simplenpc" },
+      { title: "Complex NPC", value: "complexnpc" },
+      { title: "NPC with Character Sheet", value: "npcwcharsheet" },
+      { title: "Player", value: "player" },
+    ];
+    const selectedType = ref(null);
 
     const charOptions = ref({
       name: {
@@ -141,6 +148,7 @@ export const useCharacterStore = defineStore(
 
     return {
       charType,
+      selectedType,
       charOptions,
       newChar,
       specificOptions,
