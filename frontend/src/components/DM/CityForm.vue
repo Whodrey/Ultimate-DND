@@ -30,6 +30,7 @@ const vibeSelect = ref(
 );
 const demographics = ref(createDemographics());
 const description = ref(props.city?.description ?? "");
+const isSaving = ref(false);
 
 const formTitle = computed(() => {
   if (!isEditing.value) return "Add new city";
@@ -47,7 +48,9 @@ function resetForm() {
   description.value = "";
 }
 
-function saveCity() {
+async function saveCity() {
+  if (isSaving.value) return;
+
   const cityData = {
     name: cityName.value,
     size: sizeSelect.value,
@@ -57,14 +60,22 @@ function saveCity() {
     description: description.value,
   };
 
-  if (isEditing.value) {
-    cityStore.updateCity(props.city.id, cityData);
-  } else {
-    cityStore.addCity(cityData);
-  }
+  try {
+    isSaving.value = true;
 
-  resetForm();
-  emit("close");
+    if (isEditing.value) {
+      await cityStore.updateCity(props.city.id, cityData);
+    } else {
+      await cityStore.addCity(cityData);
+    }
+
+    resetForm();
+    emit("close");
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isSaving.value = false;
+  }
 }
 </script>
 
@@ -107,7 +118,14 @@ function saveCity() {
       </v-card-text>
 
       <v-card-actions class="new-city-card-actions justify-end">
-        <v-btn color="primary" variant="flat" rounded @click="saveCity">
+        <v-btn
+          color="primary"
+          variant="flat"
+          rounded
+          :loading="isSaving"
+          :disabled="isSaving"
+          @click="saveCity"
+        >
           {{ isEditing ? "Save" : "Create" }}
         </v-btn>
       </v-card-actions>

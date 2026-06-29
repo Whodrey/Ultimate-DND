@@ -1,9 +1,11 @@
 <script setup>
+import { useCampaignStore } from "@/stores/campaignStore";
 import { useLocationStore } from "@/stores/locationStore";
 import LocationForm from "@/components/DM/LocationForm.vue";
 import DataTableDisplay from "@/components/DataTableDisplay.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
+const campaignStore = useCampaignStore();
 const locationStore = useLocationStore();
 const addLocation = ref(false);
 const editLocation = ref(false);
@@ -62,6 +64,18 @@ function closeEditLocation() {
   editLocation.value = false;
   selectedLocation.value = null;
 }
+
+watch(
+  () => campaignStore.activeCampaignId,
+  async (campaignId) => {
+    try {
+      await locationStore.loadLocations(campaignId);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

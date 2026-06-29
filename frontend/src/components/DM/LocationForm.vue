@@ -24,6 +24,7 @@ const typeSelect = ref(props.location?.type ?? null);
 const danger = ref(props.location?.danger ?? getDefaultSliderValue("danger"));
 const description = ref(props.location?.description ?? "");
 const state = ref(props.location?.state ?? getDefaultSliderValue("state"));
+const isSaving = ref(false);
 
 const formTitle = computed(() => {
   if (!isEditing.value) return "Add new location";
@@ -40,7 +41,9 @@ function resetForm() {
   state.value = getDefaultSliderValue("state");
 }
 
-function saveLocation() {
+async function saveLocation() {
+  if (isSaving.value) return;
+
   const locationData = {
     name: locationName.value,
     type: typeSelect.value,
@@ -49,14 +52,22 @@ function saveLocation() {
     state: state.value,
   };
 
-  if (isEditing.value) {
-    locationStore.updateLocation(props.location.id, locationData);
-  } else {
-    locationStore.addLocation(locationData);
-  }
+  try {
+    isSaving.value = true;
 
-  resetForm();
-  emit("close");
+    if (isEditing.value) {
+      await locationStore.updateLocation(props.location.id, locationData);
+    } else {
+      await locationStore.addLocation(locationData);
+    }
+
+    resetForm();
+    emit("close");
+  } catch (error) {
+    console.error(error);
+  } finally {
+    isSaving.value = false;
+  }
 }
 </script>
 
@@ -112,7 +123,14 @@ function saveLocation() {
         </v-form>
       </v-card-text>
       <v-card-actions class="justify-end">
-        <v-btn color="primary" variant="flat" rounded @click="saveLocation">
+        <v-btn
+          color="primary"
+          variant="flat"
+          rounded
+          :loading="isSaving"
+          :disabled="isSaving"
+          @click="saveLocation"
+        >
           {{ isEditing ? "Save" : "Create" }}
         </v-btn>
       </v-card-actions>

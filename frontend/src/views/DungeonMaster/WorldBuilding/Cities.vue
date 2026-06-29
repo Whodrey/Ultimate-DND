@@ -1,9 +1,11 @@
 <script setup>
+import { useCampaignStore } from "@/stores/campaignStore";
 import { useCityStore } from "@/stores/cityStore";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import CityForm from "@/components/DM/CityForm.vue";
 import DataTableDisplay from "@/components/DataTableDisplay.vue";
 
+const campaignStore = useCampaignStore();
 const cityStore = useCityStore();
 
 const addCity = ref(false);
@@ -85,6 +87,18 @@ function closeEditCity() {
   editCity.value = false;
   selectedCity.value = null;
 }
+
+watch(
+  () => campaignStore.activeCampaignId,
+  async (campaignId) => {
+    try {
+      await cityStore.loadCities(campaignId);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

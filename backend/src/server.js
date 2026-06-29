@@ -5,6 +5,8 @@ import express from "express";
 import { MongoClient } from "mongodb";
 
 import campaignRoutes from "./routes/campaignRoutes.js";
+import entityRoutes from "./routes/entityRoutes.js";
+import entityRelationRoutes from "./routes/entityRelationRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -28,6 +30,8 @@ app.use(express.json());
 
 app.locals.getDatabase = getDatabase;
 
+app.use("/campaigns/:campaignId/entities", entityRoutes);
+app.use("/campaigns/:campaignId/relations", entityRelationRoutes);
 app.use("/campaigns", campaignRoutes);
 
 app.get("/", (request, response) => {
