@@ -1,189 +1,33 @@
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useCharacterStore } from "@/stores/characterStore";
-import { useSpellStore } from "@/stores/spellStore";
+import { useCharacterCreationForm } from "@/composables/useCharacterCreationForm";
 import Skills from "./Skills.vue";
 import BaseAbilities from "./BaseAbilities.vue";
 import Spells from "./Spells.vue";
+import { useNpcStore } from "@/stores/npcStore.js";
 
-const props = defineProps({
-  charType: {
-    type: String,
-  },
-});
+const npcStore = useNpcStore();
 
-const characterStore = useCharacterStore();
-const spellStore = useSpellStore();
-
-// v-stepper
-const step = ref(1);
-const steps = computed(() => {
-  const visibleSteps = [{ value: 1, title: "Identity" }];
-
-  if (
-    characterStore.selectedType !== "simplenpc" &&
-    characterStore.selectedType !== "complexnpc"
-  ) {
-    visibleSteps.push(
-      { value: 2, title: "Base abilities" },
-      { value: 3, title: "Skills" },
-    );
+function addNewChar(charType) {
+  try {
+    npcStore.addNpc(characterStore.newChar);
+  } catch (error) {
+    console.log(error);
   }
-
-  if (
-    characterStore.selectedType !== "simplenpc" &&
-    characterStore.selectedType !== "complexnpc" &&
-    characterStore.canUseSpells()
-  ) {
-    visibleSteps.push({ value: 4, title: "Spells" });
-  }
-
-  return visibleSteps;
-});
-const stepItems = computed(() =>
-  steps.value.map((visibleStep) => visibleStep.title),
-);
-const hasSpellStep = computed(() =>
-  steps.value.some((visibleStep) => visibleStep.value === 4),
-);
-
-const speciesOptions = computed(() =>
-  Object.keys(characterStore.charOptions.species.options).map((species) => ({
-    title: species,
-    value: species,
-  })),
-);
-
-const selectedSpecies = computed({
-  get: () => characterStore.newChar.species,
-  set: (species) => {
-    characterStore.newChar.species = species;
-    characterStore.newChar.subspecies = "";
-  },
-});
-
-const selectedSubspecies = computed({
-  get: () => characterStore.newChar.subspecies,
-  set: (subspecies) => {
-    characterStore.newChar.subspecies = subspecies;
-  },
-});
-
-const selectedSubspeciesOptions = computed(() => {
-  if (!selectedSpecies.value) return [];
-
-  return (
-    characterStore.charOptions.species.options[selectedSpecies.value] ?? []
-  );
-});
-
-const hasSubspecies = computed(
-  () => selectedSubspeciesOptions.value.length > 0,
-);
-
-const backgroundOptions = computed(() =>
-  Object.entries(characterStore.charOptions.background.options).map(
-    ([key, background]) => ({
-      title: background.label,
-      value: key,
-    }),
-  ),
-);
-
-const selectedBackground = computed({
-  get: () => characterStore.newChar.background,
-  set: (background) => {
-    characterStore.newChar.background = background;
-  },
-});
-
-const selectedClass = computed({
-  get: () => characterStore.newChar.class,
-  set: (classKey) => {
-    characterStore.newChar.class = classKey;
-    characterStore.newChar.subclass = "";
-    applyClassDefaultAbilityScore(classKey);
-    characterStore.syncCharacterSelections();
-  },
-});
-
-const selectedSubclass = computed({
-  get: () => characterStore.newChar.subclass,
-  set: (subclass) => {
-    characterStore.newChar.subclass = subclass;
-    characterStore.syncCharacterSelections();
-  },
-});
-
-const classOptions = computed(() =>
-  Object.entries(characterStore.charOptions.class.options).map(
-    ([key, value]) => ({
-      title: value.label,
-      value: key,
-    }),
-  ),
-);
-
-function applyClassDefaultAbilityScore(classKey) {
-  const defaultAbilityScore =
-    characterStore.charOptions.class.options[classKey]?.default_ability_score;
-
-  if (!defaultAbilityScore) return;
-
-  Object.assign(characterStore.newChar.ability_score, defaultAbilityScore);
 }
 
-const selectedClassData = computed(() => {
-  if (!selectedClass.value) return null;
-  return characterStore.charOptions.class.options[selectedClass.value];
-});
-
-const canChooseSubclass = computed(
-  () =>
-    Boolean(selectedClassData.value?.subclasses?.length) &&
-    Number(characterStore.newChar.level) >= 3,
-);
-
-const subclassOptions = computed(() => {
-  if (!canChooseSubclass.value || !selectedClassData.value) return [];
-  return selectedClassData.value.subclasses;
-});
-
-watch(
+const {
+  characterStore,
+  step,
   stepItems,
-  () => {
-    if (step.value > stepItems.value.length) {
-      step.value = stepItems.value.length;
-    }
-  },
-  { immediate: true },
-);
-
-watch(
-  hasSpellStep,
-  (isVisible) => {
-    if (isVisible) {
-      spellStore.loadSpells();
-    }
-  },
-  { immediate: true },
-);
-
-watch(
-  () => [
-    characterStore.newChar.class,
-    characterStore.newChar.level,
-    characterStore.newChar.subclass,
-  ],
-  () => {
-    if (!canChooseSubclass.value && characterStore.newChar.subclass) {
-      characterStore.newChar.subclass = "";
-    }
-
-    characterStore.syncCharacterSelections();
-  },
-  { immediate: true },
-);
+  showCharacterBuildFields,
+  fieldOptions,
+  selectSpecies,
+  selectSubspecies,
+  selectBackground,
+  subclassOptions,
+  selectClass,
+  selectSubclass,
+} = useCharacterCreationForm();
 </script>
 
 <template>
@@ -211,25 +55,28 @@ watch(
                 <v-text-field label="Surname" />
                 <v-number-input :min="0" label="Age" />
                 <v-select
-                  v-model="selectedSpecies"
+                  :model-value="characterStore.newChar.species"
                   label="Species"
-                  :items="speciesOptions"
+                  :items="fieldOptions.species"
                   item-title="title"
                   item-value="value"
+                  @update:model-value="selectSpecies"
                 />
                 <v-select
-                  v-if="hasSubspecies"
-                  v-model="selectedSubspecies"
+                  v-if="fieldOptions.subspecies"
+                  :model-value="characterStore.newChar.subspecies"
                   label="Subspecies"
-                  :items="selectedSubspeciesOptions"
+                  :items="fieldOptions.subspecies"
+                  @update:model-value="selectSubspecies"
                 />
-                <template v-if="characterStore.selectedType !== 'simplenpc'">
+                <template v-if="showCharacterBuildFields">
                   <v-select
-                    v-model="selectedBackground"
+                    :model-value="characterStore.newChar.background"
                     label="Background"
-                    :items="backgroundOptions"
+                    :items="fieldOptions.backgrounds"
                     item-title="title"
                     item-value="value"
+                    @update:model-value="selectBackground"
                   />
                   <v-number-input
                     v-model="characterStore.newChar.level"
@@ -238,15 +85,17 @@ watch(
                     :max="20"
                   />
                   <v-select
-                    v-model="selectedClass"
+                    :model-value="characterStore.newChar.class"
                     label="Class"
-                    :items="classOptions"
+                    :items="fieldOptions.classes"
+                    @update:model-value="selectClass"
                   />
                   <v-select
-                    v-if="canChooseSubclass && selectedClass"
-                    v-model="selectedSubclass"
+                    v-if="subclassOptions && characterStore.newChar.class"
+                    :model-value="characterStore.newChar.subclass"
                     label="Subclass"
                     :items="subclassOptions"
+                    @update:model-value="selectSubclass"
                   />
                 </template>
               </div>

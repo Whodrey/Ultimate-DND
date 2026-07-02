@@ -1,8 +1,8 @@
 <script setup>
 import { computed, watch } from "vue";
 import { useCharacterStore } from "@/stores/characterStore";
-import { getAbilityScoreModifier } from "@/charOptions/ability_score";
-import { getProficiencyBonus } from "@/charOptions/proficiencies";
+import { getAbilityScoreModifier } from "@/options/character/rules/abilityScores";
+import { getProficiencyBonus } from "@/options/character/rules/proficiencies";
 
 const characterStore = useCharacterStore();
 const skillGroups = computed(() =>

@@ -7,6 +7,7 @@ import { MongoClient } from "mongodb";
 import campaignRoutes from "./routes/campaignRoutes.js";
 import entityRoutes from "./routes/entityRoutes.js";
 import entityRelationRoutes from "./routes/entityRelationRoutes.js";
+import { seedDevCampaign } from "./seeds/devCampaign.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -19,10 +20,64 @@ let dbPromise;
 
 function getDatabase() {
   if (!dbPromise) {
-    dbPromise = client.connect().then(() => client.db(dbName));
+    dbPromise = client
+      .connect()
+      .then(() => client.db(dbName))
+      .catch((error) => {
+        dbPromise = null;
+        throw error;
+      });
   }
 
   return dbPromise;
+}
+
+function parsePositiveInteger(value, fallback) {
+  const parsedValue = Number(value);
+
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+}
+
+function shouldSeedDevCampaign() {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.SEED_DEV_CAMPAIGN === "true"
+  );
+}
+
+async function seedDevelopmentCampaign(attempt = 1) {
+  const maxAttempts = parsePositiveInteger(
+    process.env.SEED_DEV_CAMPAIGN_ATTEMPTS,
+    10,
+  );
+  const retryDelayMs = parsePositiveInteger(
+    process.env.SEED_DEV_CAMPAIGN_RETRY_DELAY_MS,
+    2000,
+  );
+
+  try {
+    const db = await getDatabase();
+    const result = await seedDevCampaign(db);
+    const action = result.created ? "Created" : "Found existing";
+
+    console.log(`${action} dev campaign ${result.campaignId}.`);
+  } catch (error) {
+    if (attempt >= maxAttempts) {
+      console.error("Could not seed the dev campaign.");
+      console.error(error);
+      return;
+    }
+
+    console.warn(
+      `Could not seed the dev campaign yet. Retrying in ${retryDelayMs}ms.`,
+    );
+
+    setTimeout(() => {
+      seedDevelopmentCampaign(attempt + 1);
+    }, retryDelayMs);
+  }
 }
 
 app.use(cors());
@@ -65,6 +120,10 @@ app.use((error, request, response, next) => {
     message: "Internal server error",
   });
 });
+
+if (shouldSeedDevCampaign()) {
+  seedDevelopmentCampaign();
+}
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Backend listening on port ${port}`);

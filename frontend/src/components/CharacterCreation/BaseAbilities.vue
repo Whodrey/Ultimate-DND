@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useCharacterStore } from "@/stores/characterStore";
-import { getAbilityScorePointCost } from "@/charOptions/ability_score";
+import { getAbilityScorePointCost } from "@/options/character/rules/abilityScores";
 
 const characterStore = useCharacterStore();
 

@@ -1,5 +1,3 @@
-import { createEmptyAbilityScore } from "./ability_score.js";
-
 export const backgroundAbilityScoreOptions = {
   Acolyte: ["int", "wis", "cha"],
   Artisan: ["str", "dex", "int"],
@@ -33,15 +31,3 @@ export const backgroundOptions = {
     ),
   ),
 };
-
-export function getBackgroundAbilityScoreBonus(backgroundName) {
-  const ability_score = createEmptyAbilityScore();
-  const background = backgroundOptions.options[backgroundName];
-  const backgroundAbilityScores = background?.ability_score_options ?? [];
-
-  backgroundAbilityScores.forEach((ability) => {
-    ability_score[ability] += 1;
-  });
-
-  return ability_score;
-}

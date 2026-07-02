@@ -3,19 +3,15 @@ import { ref } from "vue";
 import {
   abilityScoreOptions,
   abilityScorePointBuy,
-  createPointBuyAbilityScore,
-} from "../charOptions/ability_score.js";
-import {
-  backgroundOptions,
-  getBackgroundAbilityScoreBonus,
-} from "../charOptions/background.js";
-import {
-  classOptions,
-  getClassSkillChoices,
-  getClassSpellcastingProfile,
-} from "../charOptions/class.js";
-import { skillOptions } from "../charOptions/skills.js";
-import { speciesOptions } from "../charOptions/species.js";
+} from "@/options/character/options/ability_score.js";
+import { backgroundOptions } from "@/options/character/options/background.js";
+import { classOptions } from "@/options/character/options/class.js";
+import { skillOptions } from "@/options/character/options/skills.js";
+import { speciesOptions } from "@/options/character/options/species.js";
+import { createPointBuyAbilityScore } from "@/options/character/rules/abilityScores.js";
+import { getBackgroundAbilityScoreBonus } from "@/options/character/rules/background.js";
+import { getClassSkillChoices } from "@/options/character/rules/skills.js";
+import { getClassSpellcastingProfile } from "@/options/character/rules/spellcasting.js";
 
 export const useCharacterStore = defineStore(
   "character",

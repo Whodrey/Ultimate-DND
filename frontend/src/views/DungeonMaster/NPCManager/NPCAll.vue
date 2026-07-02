@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import CharCreator from "@/components/CharacterCreation/CharCreator.vue";
+import { useNpcStore } from "@/stores/npcStore";
 
+const npcStore = useNpcStore();
 const addNPC = ref(false);
+console.log(npcStore.npcs.value);
 </script>
 
 <template>

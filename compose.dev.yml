@@ -30,6 +30,7 @@ services:
       - PORT=8080
       - MONGO_URL=mongodb://database:27017/ultimate-dnd
       - MONGO_DB=ultimate-dnd
+      - SEED_DEV_CAMPAIGN=true
     volumes:
       - ./backend:/app
       - backend-node-modules:/app/node_modules
@@ -40,6 +41,8 @@ services:
     image: mongo:8
     container_name: ${SITE_NAME:-ultimate-dnd}-database-dev
     restart: unless-stopped
+    ports:
+      - "27017:27017"
     volumes:
       - mongo-data-dev:/data/db
 

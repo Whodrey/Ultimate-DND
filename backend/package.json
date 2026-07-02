@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "seed:dev": "node src/scripts/seedDevCampaign.js",
+    "seed:dev:reset": "node src/scripts/seedDevCampaign.js --reset"
   },
   "dependencies": {
     "cors": "^2.8.5",

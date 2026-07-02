@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-
-const apiUrl = import.meta.env.VITE_BACKEND_URL ?? "/api";
+import {
+  createCampaign as createCampaignRequest,
+  getCampaign,
+  listCampaigns,
+} from "@/api/campaigns";
 
 export const useCampaignStore = defineStore(
   "campaign",
@@ -11,13 +14,7 @@ export const useCampaignStore = defineStore(
     const activeCampaign = ref(null);
 
     async function loadCampaigns() {
-      const response = await fetch(`${apiUrl}/campaigns`);
-
-      if (!response.ok) {
-        throw new Error("Could not load campaigns.");
-      }
-
-      campaigns.value = await response.json();
+      campaigns.value = await listCampaigns();
     }
 
     async function selectCampaign(campaignId) {
@@ -27,15 +24,7 @@ export const useCampaignStore = defineStore(
         return null;
       }
 
-      const response = await fetch(
-        `${apiUrl}/campaigns/${encodeURIComponent(campaignId)}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Could not load campaign.");
-      }
-
-      activeCampaign.value = await response.json();
+      activeCampaign.value = await getCampaign(campaignId);
       activeCampaignId.value =
         activeCampaign.value._id || activeCampaign.value.id;
 
@@ -43,20 +32,7 @@ export const useCampaignStore = defineStore(
     }
 
     async function createCampaign(campaignData) {
-      const response = await fetch(`${apiUrl}/campaigns`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(campaignData),
-      });
-
-      const campaign = await response.json();
-
-      if (!response.ok) {
-        throw new Error(campaign.message ?? "Could not create campaign.");
-      }
-
+      const campaign = await createCampaignRequest(campaignData);
       campaigns.value.unshift(campaign);
 
       return campaign;
